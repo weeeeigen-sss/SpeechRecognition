@@ -10,7 +10,10 @@ internal import Speech
 
 
 // MARK: - ContentView
-struct ContentView: View {
+struct ContentView: View
+{
+    @EnvironmentObject var store: WordStore
+
     @StateObject private var speechRecognizer = SpeechRecognizer()
     @State private var showingWordList = false
     
@@ -26,7 +29,7 @@ struct ContentView: View {
                         HStack {
                             Text(seg.substring)
                             Spacer()
-                            Text("confidence=\(seg.confidence), duration=\(seg.duration)")
+                            Text("range=\(seg.substringRange)\nconfidence=\(seg.confidence)\nduration=\(seg.duration)\nalternative=\(seg.alternativeSubstrings)")
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -38,7 +41,7 @@ struct ContentView: View {
             
             HStack {
                 Button("Start") {
-                    speechRecognizer.start(locale: "ja-JP")
+                    speechRecognizer.start(locale: "ja-JP", store: store)
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -63,7 +66,7 @@ struct ContentView: View {
             .padding()
         }
         .sheet(isPresented: $showingWordList) {
-            WordListView(contextualStrings: $speechRecognizer.contextualStrings)
+            WordListView(store: store)
         }
     }
 }

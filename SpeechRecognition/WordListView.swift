@@ -8,8 +8,9 @@
 import SwiftUI
 
 
-struct WordListView: View {
-    @Binding var contextualStrings: [String]
+struct WordListView: View
+{
+    @ObservedObject var store: WordStore
     @Environment(\.dismiss) private var dismiss
     
     @State private var newWord: String = ""
@@ -18,15 +19,13 @@ struct WordListView: View {
         NavigationView {
             VStack {
                 List {
-                    ForEach(contextualStrings, id: \.self) { word in
+                    ForEach(store.words, id: \.self) { word in
                         HStack {
                             Text(word)
                             Spacer()
                         }
                     }
-                    .onDelete { indexSet in
-                        contextualStrings.remove(atOffsets: indexSet)
-                    }
+                    .onDelete(perform: store.remove(at:))
                 }
                 
                 HStack {
@@ -34,8 +33,8 @@ struct WordListView: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     Button("追加") {
                         let trimmed = newWord.trimmingCharacters(in: .whitespacesAndNewlines)
-                        if !trimmed.isEmpty && !contextualStrings.contains(trimmed) {
-                            contextualStrings.append(trimmed)
+                        if !trimmed.isEmpty && !store.words.contains(trimmed) {
+                            store.add(trimmed)
                         }
                         newWord = ""
                     }
